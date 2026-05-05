@@ -1,5 +1,7 @@
 # Velô Sprint - Configurador de Veículo Elétrico
 
+Branch: refact-ia-01
+
 Aplicação web em React para configuração e compra do veículo elétrico **Velô Sprint**.
 
 ## Sobre o Projeto
@@ -68,14 +70,14 @@ VITE_SUPABASE_URL="https://seu_project_id.supabase.co"
 yarn add supabase -D
 
 # Login e vincular projeto
-supabase login
-supabase link --project-ref SEU_PROJECT_ID
+yarn supabase login
+yarn supabase link --project-ref ylhtbnzypxtmlvvhbtyo
 
 # Aplicar migrações (cria tabelas e RLS)
-supabase db push
+yarn supabase db push
 
 # Deploy das Edge Functions
-supabase functions deploy
+yarn supabase functions deploy
 ```
 
 Pronto! O banco e as functions estarão configurados.
