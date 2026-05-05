@@ -1,17 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
-
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
 export default defineConfig({
+  // Timeout do teste completo
+  timeout: 60_000,
   testDir: './playwright/e2e',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -25,6 +16,14 @@ export default defineConfig({
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
+    // Tempo máximo de navegação como goTo(), waitForUrl().
+    // Quando o valor é zero ou não especificado, o timeout é igual ao timeout do teste completo.
+    navigationTimeout: 10_000,
+
+    // Tempo máximo de execução de ações como click(), fill()...
+    // Quando o valor é zero ou não especificado, o timeout é igual ao timeout do teste completo.
+    actionTimeout: 5_000,
+    
     /* Base URL to use in actions like `await page.goto('')`. */
     // baseURL: 'http://localhost:3000',
 
