@@ -85,7 +85,7 @@ test.describe('Consulta de Pedido', () => {
       wheels: 'sport Wheels',
       customer: {
         name: 'Steve Jobs',
-        email: 'jobs@apple.com'a
+        email: 'jobs@apple.com'
       },
       payment: 'À Vista'
     }
@@ -199,7 +199,6 @@ test.describe('Consulta de Pedido', () => {
 
     await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order)
     await page.getByRole('button', { name: 'Buscar Pedido' }).click()
-
 
     await expect(page.locator('#root')).toMatchAriaSnapshot(`
       - img
