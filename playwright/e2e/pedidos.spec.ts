@@ -85,7 +85,7 @@ test.describe('Consulta de Pedido', () => {
       wheels: 'sport Wheels',
       customer: {
         name: 'Steve Jobs',
-        email: 'jobs@apple.com'
+        email: 'jobs@apple.com'a
       },
       payment: 'À Vista'
     }
