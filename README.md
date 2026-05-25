@@ -27,7 +27,14 @@ Uma SPA (Single Page Application) que permite:
 | **Backend** | Supabase (PostgreSQL + Edge Functions) |
 
 ---
+## Execução
+```bash
+cd velo
+yarn dev
+```
 
+Go to supabase and ensure its on: https://supabase.com/dashboard/project/kfgqugmmduvbfvelhzvy
+---
 ## Instalação
 
 ```bash
