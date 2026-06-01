@@ -3,6 +3,7 @@ import { test, expect } from '@playwright/test'
 import { generateOrderCode } from '../support/helpers'
 
 import { OrderLockupPage } from '../support/pages/OrderLockupPage'
+import type { OrderDetails } from '../support/pages/OrderLockupPage'
 
 /// AAA - Arrange, Act, Assert
 
@@ -20,9 +21,9 @@ test.describe('Consulta de Pedido', () => {
   test('deve consultar um pedido aprovado', async ({ page }) => {
 
     // Test Data
-    const order = {
+    const order: OrderDetails = {
       number: 'VLO-FODVB5',
-      status: 'APROVADO' as const,
+      status: 'APROVADO',
       color: 'Lunar White',
       wheels: 'aero Wheels',
       customer: {
@@ -47,9 +48,9 @@ test.describe('Consulta de Pedido', () => {
   test('deve consultar um pedido reprovado', async ({ page }) => {
 
     // Test Data
-    const order = {
+    const order: OrderDetails = {
       number: 'VLO-3MKV7Z',
-      status: 'REPROVADO' as const,
+      status: 'REPROVADO',
       color: 'Lunar White',
       wheels: 'aero Wheels',
       customer: {
@@ -73,9 +74,9 @@ test.describe('Consulta de Pedido', () => {
   test('deve consultar um pedido em analise', async ({ page }) => {
 
     // Test Data
-    const order = {
+    const order: OrderDetails = {
       number: 'VLO-OF7LXB',
-      status: 'EM_ANALISE' as const,
+      status: 'EM_ANALISE',
       color: 'Glacier Blue',
       wheels: 'aero Wheels',
       customer: {
@@ -99,6 +100,17 @@ test.describe('Consulta de Pedido', () => {
   test('deve exibir mensagem quando o pedido não é encontrado', async ({ page }) => {
 
     const order = generateOrderCode()
+
+    const orderLockupPage = new OrderLockupPage(page)
+    await orderLockupPage.searchOrder(order)
+
+    // Assert
+    await orderLockupPage.validateOrderNotFound(order)
+  })
+
+  test('deve exibir mensagem quando o pedido em qualquer formato não é encontrado', async ({ page }) => {
+
+    const order = 'abc123'
 
     const orderLockupPage = new OrderLockupPage(page)
     await orderLockupPage.searchOrder(order)
