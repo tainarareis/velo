@@ -1,24 +1,14 @@
-import { test } from '@playwright/test'
+import { test } from '../support/fixtures'
 
 import { generateOrderCode } from '../support/helpers'
-
-import { Navbar } from '../support/components/Navbar'
-import { LandingPage } from '../support/pages/LandingPage'
-import { OrderLockupPage } from '../support/pages/OrderLookupPage'
-import type { OrderDetails } from '../support/pages/OrderLookupPage'
+import type { OrderDetails } from '../support/actions/orderLookupActions'
 
 test.describe('Consulta de Pedido', () => {
-  let orderLookupPage: OrderLockupPage
-
-  test.beforeEach(async ({ page }) => {
-    await new LandingPage(page).goto()
-    await new Navbar(page).orderLookupLink()
-
-    orderLookupPage = new OrderLockupPage(page)
-    await orderLookupPage.validatePageLoaded()
+  test.beforeEach(async ({ app }) => {
+    await app.orderLookup.open()
   })
 
-  test('deve consultar um pedido aprovado', async () => {
+  test('deve consultar um pedido aprovado', async ({ app }) => {
     const order: OrderDetails = {
       number: 'VLO-FODVB5',
       status: 'APROVADO',
@@ -26,17 +16,17 @@ test.describe('Consulta de Pedido', () => {
       wheels: 'aero Wheels',
       customer: {
         name: 'Tainara Reis',
-        email: 'tainara@velo.dev'
+        email: 'tainara@velo.dev',
       },
-      payment: 'À Vista'
+      payment: 'À Vista',
     }
 
-    await orderLookupPage.searchOrder(order.number)
-    await orderLookupPage.validateOrderDetails(order)
-    await orderLookupPage.validateStatusBadge(order.status)
+    await app.orderLookup.searchOrder(order.number)
+    await app.orderLookup.validateOrderDetails(order)
+    await app.orderLookup.validateStatusBadge(order.status)
   })
 
-  test('deve consultar um pedido reprovado', async () => {
+  test('deve consultar um pedido reprovado', async ({ app }) => {
     const order: OrderDetails = {
       number: 'VLO-3MKV7Z',
       status: 'REPROVADO',
@@ -44,17 +34,17 @@ test.describe('Consulta de Pedido', () => {
       wheels: 'aero Wheels',
       customer: {
         name: 'Tainara Reis',
-        email: 'tainara@velo.dev'
+        email: 'tainara@velo.dev',
       },
-      payment: 'À Vista'
+      payment: 'À Vista',
     }
 
-    await orderLookupPage.searchOrder(order.number)
-    await orderLookupPage.validateOrderDetails(order)
-    await orderLookupPage.validateStatusBadge(order.status)
+    await app.orderLookup.searchOrder(order.number)
+    await app.orderLookup.validateOrderDetails(order)
+    await app.orderLookup.validateStatusBadge(order.status)
   })
 
-  test('deve consultar um pedido em analise', async () => {
+  test('deve consultar um pedido em analise', async ({ app }) => {
     const order: OrderDetails = {
       number: 'VLO-OF7LXB',
       status: 'EM_ANALISE',
@@ -62,27 +52,27 @@ test.describe('Consulta de Pedido', () => {
       wheels: 'aero Wheels',
       customer: {
         name: 'Tainara Reis',
-        email: 'tainara@velo.dev'
+        email: 'tainara@velo.dev',
       },
-      payment: 'À Vista'
+      payment: 'À Vista',
     }
 
-    await orderLookupPage.searchOrder(order.number)
-    await orderLookupPage.validateOrderDetails(order)
-    await orderLookupPage.validateStatusBadge(order.status)
+    await app.orderLookup.searchOrder(order.number)
+    await app.orderLookup.validateOrderDetails(order)
+    await app.orderLookup.validateStatusBadge(order.status)
   })
 
-  test('deve exibir mensagem quando o pedido não é encontrado', async () => {
+  test('deve exibir mensagem quando o pedido não é encontrado', async ({ app }) => {
     const order = generateOrderCode()
 
-    await orderLookupPage.searchOrder(order)
-    await orderLookupPage.validateOrderNotFound(order)
+    await app.orderLookup.searchOrder(order)
+    await app.orderLookup.validateOrderNotFound(order)
   })
 
-  test('deve exibir mensagem quando o pedido em qualquer formato não é encontrado', async () => {
+  test('deve exibir mensagem quando o pedido em qualquer formato não é encontrado', async ({ app }) => {
     const order = 'abc123'
 
-    await orderLookupPage.searchOrder(order)
-    await orderLookupPage.validateOrderNotFound(order)
+    await app.orderLookup.searchOrder(order)
+    await app.orderLookup.validateOrderNotFound(order)
   })
 })
