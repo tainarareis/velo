@@ -1,0 +1,21 @@
+# Desafio 2: CT03 – Configuração do Veículo com Adição de Opcionais e Cálculo de Preço
+
+Neste desafio você deverá automatizar o cenário **CT03 – Configuração do Veículo com Adição de Opcionais e Cálculo de Preço**.
+
+O objetivo é validar se o preço do veículo é atualizado corretamente ao selecionar ou remover os opcionais **Precision Park (+R$5.500)** e **Flux Capacitor (+R$5.000)**.
+
+## O que você deve fazer
+
+1. Abra o arquivo `testcases.md` e localize o cenário **CT03**.
+2. Utilize o prompt `prompt-qa-playwright-automator.md` para gerar a automação inicial com IA.
+3. Execute o teste e valide se o cenário funciona corretamente.
+4. Refatore a automação utilizando **Feature Actions**.
+5. Reutilize e estenda a camada `configuratorActions.ts` criada na aula anterior.
+
+## Entrega
+
+1. Suba sua solução em um repositório no **GitHub**.
+2. Certifique-se de que o **repositório esteja público**.
+3. Envie o **link do repositório** na plataforma para avaliação.
+
+Após o envio, será realizado um **Code Review** da sua implementação e você receberá feedback diretamente na plataforma.
