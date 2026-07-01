@@ -7,11 +7,14 @@ export type OrderDetails = {
   status: OrderStatus
   color: string
   wheels: string
-  payment: string
   customer: {
     name: string
     email: string
+    phone: string
+    document: string
   }
+  payment: string
+  total_price: string
 }
 
 export function createOrderLookupActions(page: Page) {
