@@ -10,10 +10,8 @@ test.describe('Consulta de Pedido', () => {
   })
 
   test('deve consultar um pedido aprovado', async ({ app }) => {
-    const code = generateOrderCode()
-
     const order: OrderDetails = {
-      number: code,
+      number: 'VLO-SE4R01',
       status: 'APROVADO',
       color: 'Glacier Blue',
       wheels: 'aero Wheels',
@@ -24,9 +22,11 @@ test.describe('Consulta de Pedido', () => {
       payment: 'À Vista',
     }
 
+    await deleteOrderByNumber(order.number)
+
     await insertOrder({
       id: crypto.randomUUID(),
-      order_number: code,
+      order_number: order.number,
       color: 'glacier-blue',
       wheel_type: 'aero',
       customer_name: order.customer.name,
@@ -47,10 +47,8 @@ test.describe('Consulta de Pedido', () => {
   })
 
   test('deve consultar um pedido reprovado', async ({ app }) => {
-    const code = generateOrderCode()
-
     const order: OrderDetails = {
-      number: code,
+      number: 'VLO-SE4R02',
       status: 'REPROVADO',
       color: 'Midnight Black',
       wheels: 'sport Wheels',
@@ -61,9 +59,11 @@ test.describe('Consulta de Pedido', () => {
       payment: 'À Vista',
     }
 
+    await deleteOrderByNumber(order.number)
+
     await insertOrder({
       id: crypto.randomUUID(),
-      order_number: code,
+      order_number: order.number,
       color: 'midnight-black',
       wheel_type: 'sport',
       customer_name: order.customer.name,
@@ -84,10 +84,8 @@ test.describe('Consulta de Pedido', () => {
   })
 
   test('deve consultar um pedido em análise', async ({ app }) => {
-    const code = generateOrderCode()
-
     const order: OrderDetails = {
-      number: code,
+      number: 'VLO-SE4R03',
       status: 'EM_ANALISE',
       color: 'Lunar White',
       wheels: 'aero Wheels',
@@ -98,9 +96,11 @@ test.describe('Consulta de Pedido', () => {
       payment: 'À Vista',
     }
 
+    await deleteOrderByNumber(order.number)
+
     await insertOrder({
       id: crypto.randomUUID(),
-      order_number: code,
+      order_number: order.number,
       color: 'lunar-white',
       wheel_type: 'aero',
       customer_name: order.customer.name,
@@ -133,7 +133,7 @@ test.describe('Consulta de Pedido', () => {
     await app.orderLookup.validateOrderNotFound()
   })
 
-  test('deve manter o botão de busca desabilitado com campo vazio ou apenas espaços', async ({ app, page }) => {
+  test('deve manter o botão de busca desabilitado com campo vazio ou apenas espaços', async ({ app }) => {
     const button = app.orderLookup.elements.searchButton
     await expect(button).toBeDisabled()
 
