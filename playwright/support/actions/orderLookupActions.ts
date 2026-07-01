@@ -100,8 +100,8 @@ export function createOrderLookupActions(page: Page) {
             `)
     },
 
-    async validateOrderNotFound(order: string) {
-      await expect(page.getByTestId(`order-result-${order}`)).toMatchAriaSnapshot(`
+    async validateOrderNotFound() {
+      await expect(page.locator('[data-testid^="order-result"]')).toMatchAriaSnapshot(`
             - img
             - heading "Pedido não encontrado" [level=3]
             - paragraph: Verifique o número do pedido e tente novamente

@@ -158,3 +158,13 @@ npm run dev      # Desenvolvimento
 npm run build    # Build de produção
 npm run lint     # Verificar código
 ```
+
+## Instalar Kysely e dependências para o banco de dados
+
+```bash
+nvm install 22
+nvm use 22
+yarn add -D kysely
+yarn add pg @types/pg -D
+yarn add dotenv -D
+```

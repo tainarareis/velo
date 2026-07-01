@@ -1,7 +1,8 @@
-import { expect, test } from '../support/fixtures'
-
+import { test, expect } from '../support/fixtures'
 import { generateOrderCode } from '../support/helpers'
 import type { OrderDetails } from '../support/actions/orderLookupActions'
+import { insertOrder, deleteOrderByNumber } from '../support/database/orderRepository'
+import crypto from 'crypto'
 
 test.describe('Consulta de Pedido', () => {
   test.beforeEach(async ({ app }) => {
@@ -9,17 +10,36 @@ test.describe('Consulta de Pedido', () => {
   })
 
   test('deve consultar um pedido aprovado', async ({ app }) => {
+    const code = generateOrderCode()
+
     const order: OrderDetails = {
-      number: 'VLO-FODVB5',
+      number: code,
       status: 'APROVADO',
-      color: 'Lunar White',
+      color: 'Glacier Blue',
       wheels: 'aero Wheels',
       customer: {
-        name: 'Tainara Reis',
-        email: 'tainara@velo.dev',
+        name: 'Fernando Papito',
+        email: 'papito@velo.dev',
       },
       payment: 'À Vista',
     }
+
+    await insertOrder({
+      id: crypto.randomUUID(),
+      order_number: code,
+      color: 'glacier-blue',
+      wheel_type: 'aero',
+      customer_name: order.customer.name,
+      customer_email: order.customer.email,
+      customer_phone: '(11) 99999-9999',
+      customer_cpf: '780.228.290-05',
+      payment_method: 'avista',
+      total_price: '40000',
+      status: order.status,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      optionals: [],
+    })
 
     await app.orderLookup.searchOrder(order.number)
     await app.orderLookup.validateOrderDetails(order)
@@ -27,35 +47,73 @@ test.describe('Consulta de Pedido', () => {
   })
 
   test('deve consultar um pedido reprovado', async ({ app }) => {
+    const code = generateOrderCode()
+
     const order: OrderDetails = {
-      number: 'VLO-3MKV7Z',
+      number: code,
       status: 'REPROVADO',
-      color: 'Lunar White',
-      wheels: 'aero Wheels',
+      color: 'Midnight Black',
+      wheels: 'sport Wheels',
       customer: {
-        name: 'Tainara Reis',
-        email: 'tainara@velo.dev',
+        name: 'Steve Jobs',
+        email: 'jobs@apple.com',
       },
       payment: 'À Vista',
     }
+
+    await insertOrder({
+      id: crypto.randomUUID(),
+      order_number: code,
+      color: 'midnight-black',
+      wheel_type: 'sport',
+      customer_name: order.customer.name,
+      customer_email: order.customer.email,
+      customer_phone: '(11) 99999-9999',
+      customer_cpf: '780.228.290-05',
+      payment_method: 'avista',
+      total_price: '40000',
+      status: order.status,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      optionals: [],
+    })
 
     await app.orderLookup.searchOrder(order.number)
     await app.orderLookup.validateOrderDetails(order)
     await app.orderLookup.validateStatusBadge(order.status)
   })
 
-  test('deve consultar um pedido em analise', async ({ app }) => {
+  test('deve consultar um pedido em análise', async ({ app }) => {
+    const code = generateOrderCode()
+
     const order: OrderDetails = {
-      number: 'VLO-OF7LXB',
+      number: code,
       status: 'EM_ANALISE',
-      color: 'Glacier Blue',
+      color: 'Lunar White',
       wheels: 'aero Wheels',
       customer: {
-        name: 'Tainara Reis',
-        email: 'tainara@velo.dev',
+        name: 'João da Silva',
+        email: 'joao@velo.dev',
       },
       payment: 'À Vista',
     }
+
+    await insertOrder({
+      id: crypto.randomUUID(),
+      order_number: code,
+      color: 'lunar-white',
+      wheel_type: 'aero',
+      customer_name: order.customer.name,
+      customer_email: order.customer.email,
+      customer_phone: '(11) 99999-9999',
+      customer_cpf: '780.228.290-05',
+      payment_method: 'avista',
+      total_price: '40000',
+      status: order.status,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      optionals: [],
+    })
 
     await app.orderLookup.searchOrder(order.number)
     await app.orderLookup.validateOrderDetails(order)
@@ -66,22 +124,20 @@ test.describe('Consulta de Pedido', () => {
     const order = generateOrderCode()
 
     await app.orderLookup.searchOrder(order)
-    await app.orderLookup.validateOrderNotFound(order)
+    await app.orderLookup.validateOrderNotFound()
   })
 
-  test('deve exibir mensagem quando o pedido em qualquer formato não é encontrado', async ({ app }) => {
-    const order = 'abc123'
-
-    await app.orderLookup.searchOrder(order)
-    await app.orderLookup.validateOrderNotFound(order)
+  test('deve exibir mensagem quando o código do pedido está fora do padrão', async ({ app }) => {
+    const orderCode = 'XYZ-999-INVALIDO'
+    await app.orderLookup.searchOrder(orderCode)
+    await app.orderLookup.validateOrderNotFound()
   })
 
-  test.only('deve manter o botão de busca desabilitado quando o campo de busca está vazio ou com espaço', async ({ app, page }) => {
+  test('deve manter o botão de busca desabilitado com campo vazio ou apenas espaços', async ({ app, page }) => {
     const button = app.orderLookup.elements.searchButton
     await expect(button).toBeDisabled()
 
-    const input = app.orderLookup.elements.orderInput 
-    await input.fill('   ')
+    await app.orderLookup.elements.orderInput.fill('     ')
     await expect(button).toBeDisabled()
   })
 })
