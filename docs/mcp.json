@@ -1,0 +1,12 @@
+{
+    "mcpServers": { //configuração do MCP para o playwright no Cursor IDE
+      "playwright": {
+        "command": "/Users/tainara/.nvm/versions/node/v20.17.0/bin/npx",
+        "args": ["-y", "@playwright/mcp@latest"],
+        "env": {
+          "PATH": "/Users/tainara/.nvm/versions/node/v20.17.0/bin:/usr/bin:/bin"
+        }
+      }
+    }
+  }
+  

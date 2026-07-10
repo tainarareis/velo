@@ -128,6 +128,18 @@ export function createCheckoutActions(page: Page) {
       await page.getByRole('button', { name: 'Confirmar Pedido' }).click()
     },
 
+    async selectPaymentAvista() {
+      await page.getByTestId('payment-avista').click()
+    },
+
+    async expectOrderSuccess() {
+      await expect(page).toHaveURL(/\/success/)
+      const statusElement = page.getByTestId('success-status')
+      await expect(statusElement).toBeVisible()
+      await expect(statusElement).toHaveText('Pedido Aprovado!')
+      await expect(page.getByTestId('order-id')).toBeVisible()
+    },
+
     async expectStillOnCheckout() {
       await expect(page).toHaveURL(/\/order/)
       await expect(page.getByRole('heading', { name: 'Finalizar Pedido' })).toBeVisible()
