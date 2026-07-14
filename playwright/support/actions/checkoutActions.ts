@@ -132,11 +132,23 @@ export function createCheckoutActions(page: Page) {
       await page.getByTestId('payment-avista').click()
     },
 
+    async selectPaymentFinanciamento() {
+      await page.getByTestId('payment-financiamento').click()
+    },
+
     async expectOrderSuccess() {
       await expect(page).toHaveURL(/\/success/)
       const statusElement = page.getByTestId('success-status')
       await expect(statusElement).toBeVisible()
       await expect(statusElement).toHaveText('Pedido Aprovado!')
+      await expect(page.getByTestId('order-id')).toBeVisible()
+    },
+
+    async expectOrderAnalysis() {
+      await expect(page).toHaveURL(/\/success/)
+      const statusElement = page.getByTestId('success-status')
+      await expect(statusElement).toBeVisible()
+      await expect(statusElement).toHaveText('Pedido em Análise!')
       await expect(page.getByTestId('order-id')).toBeVisible()
     },
 
