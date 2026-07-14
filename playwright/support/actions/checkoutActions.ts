@@ -136,6 +136,10 @@ export function createCheckoutActions(page: Page) {
       await page.getByTestId('payment-financiamento').click()
     },
 
+    async fillEntryValue(value: string) {
+      await page.getByTestId('input-entry-value').fill(value)
+    },
+
     async expectOrderSuccess() {
       await expect(page).toHaveURL(/\/success/)
       const statusElement = page.getByTestId('success-status')
@@ -149,6 +153,14 @@ export function createCheckoutActions(page: Page) {
       const statusElement = page.getByTestId('success-status')
       await expect(statusElement).toBeVisible()
       await expect(statusElement).toHaveText('Pedido em Análise!')
+      await expect(page.getByTestId('order-id')).toBeVisible()
+    },
+
+    async expectOrderReproved() {
+      await expect(page).toHaveURL(/\/success/)
+      const statusElement = page.getByTestId('success-status')
+      await expect(statusElement).toBeVisible()
+      await expect(statusElement).toHaveText('Crédito Reprovado')
       await expect(page.getByTestId('order-id')).toBeVisible()
     },
 

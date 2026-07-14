@@ -180,4 +180,117 @@ test.describe('Checkout - Fluxo Feliz', () => {
     //Assert
     await app.checkout.expectOrderAnalysis()
   })
+
+  test('CT08.1 - deve reprovar o crédito quando o score for <= 500 no financiamento sem entrada', async ({ page, app }) => {
+    const order = {
+      store: 'Velô Paulista - Av. Paulista, 1000',
+      expectedPrice: 'R$ 40.800,00',
+    } as const
+
+    const customer = {
+      name: 'João',
+      surname: 'Silva',
+      email: 'joaosilva_ct081@email.com',
+      phone: '(11) 97777-7777',
+      cpf: '529.982.247-25',
+    } as const
+
+    await deleteOrdersByEmail(customer.email)
+
+    await page.route('**/functions/v1/credit-analysis', async route => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          status: 'Done',
+          score: 400
+        })
+      })
+    })
+
+    //Arrange
+    await page.goto('/')
+    await page.getByRole('link', { name: /Configure Agora/i }).click()
+    await expect(page).toHaveURL(/\/configure/)
+    await app.configurator.finishConfigurator()
+
+    //Act
+    await app.checkout.fillName(customer.name)
+    await app.checkout.fillLastname(customer.surname)
+    await app.checkout.fillEmail(customer.email)
+    await app.checkout.fillPhone(customer.phone)
+    await app.checkout.fillCpf(customer.cpf)
+    
+    await app.checkout.selectStore(order.store)
+    await app.checkout.selectPaymentFinanciamento()
+    
+    // Sem entrada (0)
+    await app.checkout.fillEntryValue('0')
+
+    await app.checkout.expectCheckoutPrice(order.expectedPrice)
+
+    await app.checkout.acceptTerms(true)
+    await app.checkout.submit()
+
+    //Assert
+    await app.checkout.expectOrderReproved()
+    
+    const orderId = await page.getByTestId('order-id').textContent() || ''
+    await deleteOrderByNumber(orderId)
+  })
+
+  test('CT08.2 - deve reprovar o crédito quando o score for <= 500 no financiamento com entrada menor que 50%', async ({ page, app }) => {
+    const order = {
+      store: 'Velô Paulista - Av. Paulista, 1000',
+      expectedPrice: 'R$ 30.600,00',
+    } as const
+
+    const customer = {
+      name: 'João',
+      surname: 'Silva',
+      email: 'joaosilva_ct082@email.com',
+      phone: '(11) 97777-7777',
+      cpf: '529.982.247-25',
+    } as const
+
+    await deleteOrdersByEmail(customer.email)
+
+    await page.route('**/functions/v1/credit-analysis', async route => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          status: 'Done',
+          score: 400
+        })
+      })
+    })
+
+    //Arrange
+    await page.goto('/')
+    await page.getByRole('link', { name: /Configure Agora/i }).click()
+    await expect(page).toHaveURL(/\/configure/)
+    await app.configurator.finishConfigurator()
+
+    //Act
+    await app.checkout.fillName(customer.name)
+    await app.checkout.fillLastname(customer.surname)
+    await app.checkout.fillEmail(customer.email)
+    await app.checkout.fillPhone(customer.phone)
+    await app.checkout.fillCpf(customer.cpf)
+    
+    await app.checkout.selectStore(order.store)
+    await app.checkout.selectPaymentFinanciamento()
+    
+    // Entrada menor que 50% (10000 de 40800)
+    await app.checkout.fillEntryValue('10000')
+
+    await app.checkout.expectCheckoutPrice(order.expectedPrice)
+
+    await app.checkout.acceptTerms(true)
+    await app.checkout.submit()
+
+    //Assert
+    await app.checkout.expectOrderReproved()
+  })
 })
