@@ -1,9 +1,19 @@
 import { test, expect } from '../support/fixtures'
 import { CHECKOUT_ERRORS, VALID_CHECKOUT_DATA } from '../support/actions/checkoutActions'
 import { deleteOrderByNumber, deleteOrdersByEmail } from '../support/database/orderRepository'
+import rawTestData from '../support/fixtures/checkout.json' with {type: 'json'}
 
+type CheckoutTestData = {
+  score: number
+  status: 'APROVADO' | 'EM_ANALISE' | 'REPROVADO'
+  entry: string
+  checkoutPrice: string
+  message: string
+}
 
-test.describe('Checkout - Validação de Formulário', () => {
+const testData = rawTestData as CheckoutTestData[]
+
+test.describe('Validação de Formulário', () => {
   test.beforeEach(async ({ app }) => {
     await app.checkout.open()
   })
@@ -56,7 +66,7 @@ test.describe('Checkout - Validação de Formulário', () => {
   })
 })
 
-test.describe('Checkout - Fluxo Feliz', () => {
+test.describe('Pagamento e Confirmação', () => {
   test('CT05 - deve realizar pedido à vista com sucesso a partir da landing page', async ({ page, app }) => {
     const order = {
       store: 'Velô Paulista - Av. Paulista, 1000',
@@ -86,211 +96,36 @@ test.describe('Checkout - Fluxo Feliz', () => {
     await app.checkout.submit()
 
     //Assert
-    await app.checkout.expectOrderSuccess()
+    await app.checkout.expectOrderStatus('APROVADO')
 
     //Cleanup (Second option)
     const orderId = await page.getByTestId('order-id').textContent() || ''
     await deleteOrderByNumber(orderId)
   })
 
-  test('CT06 - deve aprovar automaticamente o crédito quando o score do CPF for maior que 700 no financiamento.', async ({ page, app }) => {
-    const order = {
-      store: 'Velô Paulista - Av. Paulista, 1000',
-      expectedPrice: 'R$ 40.800,00',
-    } as const
+  for (const data of testData) {
+    test(data.message, async ({ app }) => {
+      await deleteOrdersByEmail(VALID_CHECKOUT_DATA.email)
 
-    await deleteOrdersByEmail(VALID_CHECKOUT_DATA.email)
+      await app.mock.creditAnalysis(data.score)
 
-    await page.route('**/functions/v1/credit-analysis', async route => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          status: 'Done',
-          score: 710
-        })
-      })
+      //Arrange
+      await app.hero.goToConfigurator()
+      await app.configurator.finishConfigurator()
+
+      //Act
+      await app.checkout.fillValidCustomerData({ acceptTerms: true, includeCpf: true })
+
+      await app.checkout.selectStore('Velô Paulista - Av. Paulista, 1000')
+      await app.checkout.selectPaymentFinanciamento()
+      await app.checkout.fillEntryValue(data.entry)
+      await app.checkout.expectCheckoutPrice(data.checkoutPrice)
+
+      await app.checkout.acceptTerms(true)
+      await app.checkout.submit()
+
+      //Assert
+      await app.checkout.expectOrderStatus(data.status)
     })
-
-    //Arrange
-    await page.goto('/')
-    await page.getByRole('link', { name: /Configure Agora/i }).click()
-    await expect(page).toHaveURL(/\/configure/)
-    await app.configurator.finishConfigurator()
-
-    //Act
-    await app.checkout.fillValidCustomerData({ acceptTerms: true, includeCpf: true })
-
-    await app.checkout.selectStore(order.store)
-    await app.checkout.selectPaymentFinanciamento()
-
-    await app.checkout.expectCheckoutPrice(order.expectedPrice)
-
-    await app.checkout.acceptTerms(true)
-    await app.checkout.submit()
-
-    //Assert
-    await app.checkout.expectOrderSuccess()
-  })
-
-  test('CT07 - deve colocar o pedido em análise quando o score do CPF for entre 501 e 700 no financiamento.', async ({ page, app }) => {
-    const order = {
-      store: 'Velô Paulista - Av. Paulista, 1000',
-      expectedPrice: 'R$ 40.800,00',
-    } as const
-
-    const customer = {
-      name: 'Maria',
-      surname: 'Souza',
-      email: 'mariasouza@email.com',
-      phone: '(11) 98888-8888',
-      cpf: '746.902.510-37',
-    } as const
-
-    await deleteOrdersByEmail(customer.email)
-
-    await page.route('**/functions/v1/credit-analysis', async route => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          status: 'Done',
-          score: 600
-        })
-      })
-    })
-
-    //Arrange
-    await page.goto('/')
-    await page.getByRole('link', { name: /Configure Agora/i }).click()
-    await expect(page).toHaveURL(/\/configure/)
-    await app.configurator.finishConfigurator()
-
-    //Act
-    await app.checkout.fillValidCustomerData({ acceptTerms: true, includeCpf: true })
-
-    await app.checkout.selectStore(order.store)
-    await app.checkout.selectPaymentFinanciamento()
-
-    await app.checkout.expectCheckoutPrice(order.expectedPrice)
-
-    await app.checkout.acceptTerms(true)
-    await app.checkout.submit()
-
-    //Assert
-    await app.checkout.expectOrderAnalysis()
-  })
-
-  test('CT08.1 - deve reprovar o crédito quando o score for <= 500 no financiamento sem entrada', async ({ page, app }) => {
-    const order = {
-      store: 'Velô Paulista - Av. Paulista, 1000',
-      expectedPrice: 'R$ 40.800,00',
-    } as const
-
-    const customer = {
-      name: 'João',
-      surname: 'Silva',
-      email: 'joaosilva_ct081@email.com',
-      phone: '(11) 97777-7777',
-      cpf: '529.982.247-25',
-    } as const
-
-    await deleteOrdersByEmail(customer.email)
-
-    await page.route('**/functions/v1/credit-analysis', async route => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          status: 'Done',
-          score: 400
-        })
-      })
-    })
-
-    //Arrange
-    await page.goto('/')
-    await page.getByRole('link', { name: /Configure Agora/i }).click()
-    await expect(page).toHaveURL(/\/configure/)
-    await app.configurator.finishConfigurator()
-
-    //Act
-    await app.checkout.fillName(customer.name)
-    await app.checkout.fillLastname(customer.surname)
-    await app.checkout.fillEmail(customer.email)
-    await app.checkout.fillPhone(customer.phone)
-    await app.checkout.fillCpf(customer.cpf)
-    
-    await app.checkout.selectStore(order.store)
-    await app.checkout.selectPaymentFinanciamento()
-    
-    // Sem entrada (0)
-    await app.checkout.fillEntryValue('0')
-
-    await app.checkout.expectCheckoutPrice(order.expectedPrice)
-
-    await app.checkout.acceptTerms(true)
-    await app.checkout.submit()
-
-    //Assert
-    await app.checkout.expectOrderReproved()
-    
-    const orderId = await page.getByTestId('order-id').textContent() || ''
-    await deleteOrderByNumber(orderId)
-  })
-
-  test('CT08.2 - deve reprovar o crédito quando o score for <= 500 no financiamento com entrada menor que 50%', async ({ page, app }) => {
-    const order = {
-      store: 'Velô Paulista - Av. Paulista, 1000',
-      expectedPrice: 'R$ 30.600,00',
-    } as const
-
-    const customer = {
-      name: 'João',
-      surname: 'Silva',
-      email: 'joaosilva_ct082@email.com',
-      phone: '(11) 97777-7777',
-      cpf: '529.982.247-25',
-    } as const
-
-    await deleteOrdersByEmail(customer.email)
-
-    await page.route('**/functions/v1/credit-analysis', async route => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          status: 'Done',
-          score: 400
-        })
-      })
-    })
-
-    //Arrange
-    await page.goto('/')
-    await page.getByRole('link', { name: /Configure Agora/i }).click()
-    await expect(page).toHaveURL(/\/configure/)
-    await app.configurator.finishConfigurator()
-
-    //Act
-    await app.checkout.fillName(customer.name)
-    await app.checkout.fillLastname(customer.surname)
-    await app.checkout.fillEmail(customer.email)
-    await app.checkout.fillPhone(customer.phone)
-    await app.checkout.fillCpf(customer.cpf)
-    
-    await app.checkout.selectStore(order.store)
-    await app.checkout.selectPaymentFinanciamento()
-    
-    // Entrada menor que 50% (10000 de 40800)
-    await app.checkout.fillEntryValue('10000')
-
-    await app.checkout.expectCheckoutPrice(order.expectedPrice)
-
-    await app.checkout.acceptTerms(true)
-    await app.checkout.submit()
-
-    //Assert
-    await app.checkout.expectOrderReproved()
-  })
+  }
 })

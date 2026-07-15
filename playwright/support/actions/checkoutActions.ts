@@ -140,27 +140,16 @@ export function createCheckoutActions(page: Page) {
       await page.getByTestId('input-entry-value').fill(value)
     },
 
-    async expectOrderSuccess() {
+    async expectOrderStatus(status: 'APROVADO' | 'EM_ANALISE' | 'REPROVADO') {
+      const statusTexts = {
+        'APROVADO': 'Pedido Aprovado!',
+        'EM_ANALISE': 'Pedido em Análise!',
+        'REPROVADO': 'Crédito Reprovado',
+      }
       await expect(page).toHaveURL(/\/success/)
       const statusElement = page.getByTestId('success-status')
       await expect(statusElement).toBeVisible()
-      await expect(statusElement).toHaveText('Pedido Aprovado!')
-      await expect(page.getByTestId('order-id')).toBeVisible()
-    },
-
-    async expectOrderAnalysis() {
-      await expect(page).toHaveURL(/\/success/)
-      const statusElement = page.getByTestId('success-status')
-      await expect(statusElement).toBeVisible()
-      await expect(statusElement).toHaveText('Pedido em Análise!')
-      await expect(page.getByTestId('order-id')).toBeVisible()
-    },
-
-    async expectOrderReproved() {
-      await expect(page).toHaveURL(/\/success/)
-      const statusElement = page.getByTestId('success-status')
-      await expect(statusElement).toBeVisible()
-      await expect(statusElement).toHaveText('Crédito Reprovado')
+      await expect(statusElement).toHaveText(statusTexts[status])
       await expect(page.getByTestId('order-id')).toBeVisible()
     },
 
