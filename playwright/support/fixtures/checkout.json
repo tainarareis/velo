@@ -1,0 +1,44 @@
+[
+    {
+        "score": 710,
+        "status": "APROVADO",
+        "entry": "0",
+        "checkoutPrice": "R$ 40.800,00",
+        "message": "CT06 - deve aprovar automaticamente o crédito quando o score do CPF for maior que 700 no financiamento SEM entrada"
+    },
+    {
+        "score": 600,
+        "status": "EM_ANALISE",
+        "entry": "0",
+        "checkoutPrice": "R$ 40.800,00",
+        "message": "CT07 - deve colocar o pedido em análise quando o score do CPF for entre 501 e 700 no financiamento SEM entrada"
+    },
+    {
+        "score": 500,
+        "status": "REPROVADO",
+        "entry": "0",
+        "checkoutPrice": "R$ 40.800,00",
+        "message": "CT08.1 - deve reprovar o crédito quando o score for igual a 500 no financiamento SEM entrada"
+    },
+    {
+        "score": 400,
+        "status": "REPROVADO",
+        "entry": "10000",
+        "checkoutPrice": "R$ 30.600,00",
+        "message": "CT08.2 - deve reprovar o crédito quando o score for <= 500 no financiamento com entrada MENOR que 50%"
+    },
+    {
+        "score": 450,
+        "status": "APROVADO",
+        "entry": "20000",
+        "checkoutPrice": "R$ 20.400,00",
+        "message": "CT08.3 - deve aprovar o crédito quando o score for <= 500 no financiamento com entrada IGUAL a 50%"
+    },
+    {
+        "score": 300,
+        "status": "APROVADO",
+        "entry": "30000",
+        "checkoutPrice": "R$ 10.200,00",
+        "message": "CT08.4 - deve reprovar o crédito quando o score for <= 500 no financiamento com entrada MAIOR que 50%"
+    }
+]
