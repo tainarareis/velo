@@ -3,11 +3,11 @@ import { Page, expect } from '@playwright/test'
 export type ExteriorColorLabel = 'Glacier Blue' | 'Midnight Black' | 'Lunar White'
 export type OptionalFeature = 'precision-park' | 'flux-capacitor'
 
-export const CONFIGURATOR_ASSETS = {
-  midnightBlackAero: '/src/assets/midnight-black-aero-wheels.png',
-  lunarWhiteAero: '/src/assets/lunar-white-aero-wheels.png',
-  glacierBlueSport: '/src/assets/glacier-blue-sport-wheels.png',
-  glacierBlueAero: '/src/assets/glacier-blue-aero-wheels.png',
+export const CONFIGURATOR_ASSETS_REGEX = {
+  midnightBlackAero: /midnight-black-aero-wheels/,
+  lunarWhiteAero: /lunar-white-aero-wheels/,
+  glacierBlueSport: /glacier-blue-sport-wheels/,
+  glacierBlueAero: /glacier-blue-aero-wheels/,
 } as const
 
 export const BASE_PRICE = 'R$ 40.000,00'
@@ -52,7 +52,7 @@ export function createConfiguratorActions(page: Page) {
       await page.getByRole('button', { name }).click()
     },
 
-    async expectCarImageSrc(src: string) {
+    async expectCarImageSrc(src: string | RegExp) {
       const carImage = page.locator('img[alt^="Velô Sprint"]')
       await expect(carImage).toHaveAttribute('src', src)
     },

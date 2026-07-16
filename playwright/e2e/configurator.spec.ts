@@ -2,7 +2,7 @@ import { test } from '../support/fixtures'
 import {
   BASE_PRICE,
   BOTH_OPTIONALS_PRICE,
-  CONFIGURATOR_ASSETS,
+  CONFIGURATOR_ASSETS_REGEX,
   PRECISION_PARK_PRICE,
   SPORT_WHEELS_PRICE,
 } from '../support/actions/configuratorActions'
@@ -17,11 +17,11 @@ test.describe('Configuração do Veículo', () => {
 
     await app.configurator.selectColor('Midnight Black')
     await app.configurator.expectPrice(BASE_PRICE)
-    await app.configurator.expectCarImageSrc(CONFIGURATOR_ASSETS.midnightBlackAero)
+    await app.configurator.expectCarImageSrc(CONFIGURATOR_ASSETS_REGEX.midnightBlackAero)
 
     await app.configurator.selectColor('Lunar White')
     await app.configurator.expectPrice(BASE_PRICE)
-    await app.configurator.expectCarImageSrc(CONFIGURATOR_ASSETS.lunarWhiteAero)
+    await app.configurator.expectCarImageSrc(CONFIGURATOR_ASSETS_REGEX.lunarWhiteAero)
   })
 
   test('deve atualizar a imagem e o preço ao alterar as rodas para Sport e retornar ao valor inicial ao alterar para Aero', async ({ app }) => {
@@ -29,11 +29,11 @@ test.describe('Configuração do Veículo', () => {
 
     await app.configurator.selectWheels('sport')
     await app.configurator.expectPrice(SPORT_WHEELS_PRICE)
-    await app.configurator.expectCarImageSrc(CONFIGURATOR_ASSETS.glacierBlueSport)
+    await app.configurator.expectCarImageSrc(CONFIGURATOR_ASSETS_REGEX.glacierBlueSport)
 
     await app.configurator.selectWheels('aero')
     await app.configurator.expectPrice(BASE_PRICE)
-    await app.configurator.expectCarImageSrc(CONFIGURATOR_ASSETS.glacierBlueAero)
+    await app.configurator.expectCarImageSrc(CONFIGURATOR_ASSETS_REGEX.glacierBlueAero)
   })
 
   test('deve atualizar o preço ao adicionar e remover opcionais e persistir a configuração no checkout', async ({ app }) => {
