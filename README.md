@@ -168,3 +168,20 @@ yarn add -D kysely
 yarn add pg @types/pg -D
 yarn add dotenv -D
 ```
+
+## Vercel (Deploy)
+
+```bash
+# Instalar Vercel
+yarn add vercel -D
+
+# Vincular projeto
+yarn vercel link 
+
+# Build
+yarn vercel build
+
+# Deploy manual em preview
+yarn vercel deploy --prebuilt --target=preview 
+
+```
