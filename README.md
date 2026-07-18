@@ -185,3 +185,11 @@ yarn vercel build
 yarn vercel deploy --prebuilt --target=preview 
 
 ```
+
+## TestDino
+
+```bash
+yarn add tdpw -D
+yarn playwright test
+npx tdpw upload ./playwright-report --token={{token}} --upload-html
+```
